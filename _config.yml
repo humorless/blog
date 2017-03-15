@@ -75,7 +75,7 @@ deploy:
 backup:
   type: git
   repository: 
-    github: git@github.com:humorless/humorless.github.io.git,backup
+    github: git@github.com:humorless/humorless.github.io.git, backup
 
 # standard markdown
 marked:
