@@ -1,5 +1,5 @@
 ---
-title: complexity
+title: 定義與實作
 date: 2017-04-28 12:57:46
 tags: ["essential complexity", "accidental complexity"]
 ---
