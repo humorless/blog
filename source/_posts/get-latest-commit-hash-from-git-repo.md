@@ -8,6 +8,8 @@ tags: [git, dependency]
 
 去年的解法是這樣子，因為公司的 git repository 是放在 gitlab 上。我觀察了 gitlab 和 github 都有相似的 atom.xml 。不僅路徑一樣、輸出的格式也一樣，我就乾脆使用 gitlab 的 RSS 訂閱 API 來查 git 遠端 repository 最新的 commit hash 。然而， gitlab 在中國是常常連不上的。為了中國的問題，不得不把 git repository 換成是中國境內的 git 服務商，換成了 coding.net 的服務。然後，我就必須要重寫程式了，因為 coding.net 並沒有 RSS 訂閱的功能。
 
+<!--more-->
+
 這個事情，仔細來思考，最根本的錯誤，就是我居然讓軟體的功能去依賴 gitlab 的一個 API 。所以一旦更換成別家的 git repository ，功能就得重新實現。理解了這個需求之後，我現在的重新實現，則是要讓這個「取得 git 遠端 repository 最新的 commit hash 」的功能，直接依賴於 git 指令。指令出乎意料的單純： ` git ls-remote $GITURL`
 ```
 $ git ls-remote https://github.com/humorless/humorless.github.io.git

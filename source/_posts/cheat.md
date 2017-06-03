@@ -11,6 +11,7 @@ tags: cheat
 $sudo pip install cheat
 
 ```
+<!--more-->
 
 用 cheat 查到的，常常都是該指令最經典的用法，比方說：
 ```

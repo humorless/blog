@@ -12,6 +12,8 @@ When I see patterns in my programs, I consider it a sign of trouble. The shape o
 
 為了想出可以妥善解釋這段話的意思的 non-trivial 範例，其實我還想了滿久的。不料真的就在我學習 clojure 語言的過程之中找到了。這個範例是對某個 array 的每一個元素，做相同的運算處理：一個是循序處理、一個是平行處理。
 
+<!--more-->
+
 ### golang 的兩個版本
 
 循序處理的版本

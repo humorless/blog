@@ -14,6 +14,8 @@ tags: ["essential complexity", "accidental complexity"]
 3. 加入合適的抽象層  
     我們後來決定，要在再加入一層抽象層： restful API 用來包住資料庫的存取指令 。如此讓程式碼可以依賴於 restful API ，而不是直接依賴於某個特定的資料庫。
 
+<!--more-->
+
 這些重構，讓我想清楚了軟體工程中很重要的一個概念：「定義」與「實作」的分離。此處的『定義』，也可以解釋成「企業邏輯」，對應的複雜度可以用 essentail complexity 來理解。換言之，定義層次的複雜度、定義層次的語意，是由需求來決定。此處的『實作』，則是指實現企業邏輯的各種可能的方案，對應的複雜度可以用 accidental complexity ，(當然我們一定儘可能去選擇 low accidental complexity 的方式來實現。) 一旦加入了 API 抽象層之後，日後的修改就會變得相對簡單。
 
 比方說，如果是要從 gateway 模組移動 restful API 到 cron 模組，那我們測試的時候，只要確定 gateway 模組與 cron 模組使用 restful API 的方式是等價即可。 API 實現的細節則不會再有任何的改動。
