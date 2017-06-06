@@ -11,4 +11,4 @@ message queue 對我來說，一直都覺得它是一個很抽象，很難完整
 ![使用前](./datapipeline_complex.png)
 ![使用後](./datapipeline_simple.png)
 
-原始的圖，出自一篇 linked 講 kafka 的文章。
+原始的圖，出自一篇 linkedin 講 kafka 的文章。
