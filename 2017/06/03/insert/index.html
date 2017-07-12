@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>insert | 程式人蔘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="同事為了快速開發，讀寫資料庫的程式碼並沒有多加考慮「資料庫」的特性，而是直接把資料庫當作 memory 來操作。這樣子的寫法，在資料量少的時候還好，資料量大的時候，就需要重構了。這段程式碼處理的問題是： 有一張 table ，有 4000 多個 rows 。每一段時間，就會得到大部分相同但是少部分不同的資料，要寫入這張表。相同的 row 要更新、不存在的 row 要插入。原始的寫法則是：「對於要更">
+<meta name="keywords" content="temp table,insert on duplicate key update,SQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="insert">
+<meta property="og:url" content="http://humorless.github.io/2017/06/03/insert/index.html">
+<meta property="og:site_name" content="程式人蔘">
+<meta property="og:description" content="同事為了快速開發，讀寫資料庫的程式碼並沒有多加考慮「資料庫」的特性，而是直接把資料庫當作 memory 來操作。這樣子的寫法，在資料量少的時候還好，資料量大的時候，就需要重構了。這段程式碼處理的問題是： 有一張 table ，有 4000 多個 rows 。每一段時間，就會得到大部分相同但是少部分不同的資料，要寫入這張表。相同的 row 要更新、不存在的 row 要插入。原始的寫法則是：「對於要更">
+<meta property="og:updated_time" content="2017-07-12T15:37:55.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="insert">
+<meta name="twitter:description" content="同事為了快速開發，讀寫資料庫的程式碼並沒有多加考慮「資料庫」的特性，而是直接把資料庫當作 memory 來操作。這樣子的寫法，在資料量少的時候還好，資料量大的時候，就需要重構了。這段程式碼處理的問題是： 有一張 table ，有 4000 多個 rows 。每一段時間，就會得到大部分相同但是少部分不同的資料，要寫入這張表。相同的 row 要更新、不存在的 row 要插入。原始的寫法則是：「對於要更">
+  
+    <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程式人蔘</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">舊版blog http://irongateinfo.blogspot.tw</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://humorless.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-insert" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/03/insert/" class="article-date">
+  <time datetime="2017-06-02T21:03:24.000Z" itemprop="datePublished">2017-06-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      insert
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>同事為了快速開發，讀寫資料庫的程式碼並沒有多加考慮「資料庫」的特性，而是直接把資料庫當作 memory 來操作。這樣子的寫法，在資料量少的時候還好，資料量大的時候，就需要重構了。這段程式碼處理的問題是： 有一張 table ，有 4000 多個 rows 。每一段時間，就會得到大部分相同但是少部分不同的資料，要寫入這張表。相同的 row 要更新、不存在的 row 要插入。原始的寫法則是：「對於要更新的資料的每一筆，用它的 primary key ，也就是 <code>hostname</code> 這個 column 去 query 這張 table ，如果存在就更新，如果不存在就插入。」</p>
+<a id="more"></a>
+<h2 id="重構的想法"><a href="#重構的想法" class="headerlink" title="重構的想法"></a>重構的想法</h2><p>原始的作法造成了效能的瓶頸。改進的方式則是要依據幾個重要的想法：</p>
+<ol>
+<li>因為 application server 和 database server 之間有透過網路傳輸，所以「要更新的資料」，應該要儘量批次地送到 database server 。而不是一個一個 row 來傳送。</li>
+<li>對於資料的運算，可以發生在 application server ，也可以發生在 database server。如果運算可以利用 SQL 語言來描述的話，就可以發生在 database server，也就可以先把資料送到 database 再做運算。</li>
+</ol>
+<p>我查到的資料裡，還有發現 MySQL 為了這一類的問題，還有一個專用的指令 <code>insert on duplicate key update</code> ，不過，由於我的資料表有 auto increment key ，我就選擇用 temp table 的作法。</p>
+<h2 id="重構的程式碼"><a href="#重構的程式碼" class="headerlink" title="重構的程式碼"></a>重構的程式碼</h2><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"># 準備全新的 temporary table </div><div class="line">DROP TEMPORARY TABLE IF EXISTS temp;</div><div class="line">CREATE TEMPORARY TABLE temp LIKE hosts;</div><div class="line"></div><div class="line"># 將資料從「外部」填入 temp 表之中</div><div class="line"># 利用迴圈來建構 SQL 的 values part。</div><div class="line"># 需要注意 mysql max_allowed_packet 的常數。</div><div class="line">INSERT INTO temp</div><div class="line">(hostname, exist, activate, platform, platforms, idc, ip, isp, province, city, updated)</div><div class="line">       VALUES    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW());</div><div class="line"></div><div class="line"># 開始交易</div><div class="line">BEGIN;</div><div class="line"></div><div class="line"># 利用 inner join 找出有重複的 row，做 update 的操作。</div><div class="line">UPDATE hosts</div><div class="line">INNER JOIN temp</div><div class="line">ON   hosts.hostname =   temp.hostname</div><div class="line">SET hosts.exist = 1, hosts.activate = temp.activate, hosts.platform = temp.platform,</div><div class="line">    hosts.platforms = temp.platforms, hosts.idc = temp.idc, hosts.ip = temp.ip,</div><div class="line">    hosts.isp = temp.isp, hosts.province = temp.province, hosts.city = temp.city,</div><div class="line">    hosts.updated = temp.updated;</div><div class="line"></div><div class="line"># 利用 anti join 找出沒有重複出現的 row ，做 insert 的操作。</div><div class="line">INSERT INTO hosts(hostname, exist, activate, platform, platforms, idc, ip, isp, province, city, updated)</div><div class="line">SELECT temp.hostname, temp.exist, temp.activate, temp.platform, temp.platforms, temp.idc,</div><div class="line">       temp.ip, temp.isp, temp.province, temp.city, temp.updated</div><div class="line">FROM temp LEFT JOIN hosts</div><div class="line">ON  temp.hostname = hosts.hostname</div><div class="line">WHERE hosts.hostname IS NULL;</div><div class="line"></div><div class="line"># 結束交易</div><div class="line">COMMIT;</div><div class="line"></div><div class="line">DROP TEMPORARY TABLE temp;</div></pre></td></tr></table></figure>
+<h2 id="安全性議題"><a href="#安全性議題" class="headerlink" title="安全性議題"></a>安全性議題</h2><p>當我把重構完成之後，就請同事幫我做 code review 。很快就找到了一個很大的問題，沒有考慮 security 。因為來源的資料是系統外的，有可能會有 SQL injection 。所以資料在插入資料表之前，應該要做 prepared statement ，才能確保安全性。</p>
+<h2 id="實際效能測試"><a href="#實際效能測試" class="headerlink" title="實際效能測試"></a>實際效能測試</h2><p>做效能測試之後，發現有兩種解法，效能都是可以接受的。</p>
+<ol>
+<li>在插入大量的資料進入 temp table 時，使用 multiple insert 的語法。只用一個 SQL 指令就完成插入。(當然資料要先做字元的逸脫處理。)　用這樣子的作法的話，要考慮 4000 個 rows 的資料一次送到 database server 時， mysql 的 <code>max_allowed_packet</code> 常數是否夠大。</li>
+<li>在插入大量的資料進入 temp table 時，逐條插入，但是使用 prepared statement 。這樣子的效能會略慢一些些，但是基本上也是夠快的。</li>
+</ol>
+<h2 id="除錯與驗証"><a href="#除錯與驗証" class="headerlink" title="除錯與驗証"></a>除錯與驗証</h2><p>開發的過程中，由於使用了 temp table ，而 MySQL 的 temp table 是只屬於 session 的。此外，MySQL 又會做 connection pooling ，所以開發的過程中，一度遇到「 temp table 不存在」的錯誤訊息，怎麼看都看不出 SQL 哪裡出錯，結果原來是因為 connection pooling 的關系，不同的 connection 無法共享 temp table 。 </p>
+<p>由於有 connection pooling ，所以還是得要看 mysql general log 才能確定 connection 的 id 是否正確。
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># in mysql, set these two parameters to show general log</span></div><div class="line">SET GLOBAL general_log = <span class="string">'ON'</span>;</div><div class="line">SET GLOBAL general_log_file = <span class="string">'/var/log/mysql/general.log'</span>;</div><div class="line"></div><div class="line"><span class="comment"># in shell, execute it. </span></div><div class="line">docker <span class="built_in">exec</span> -t <span class="variable">$MYSQL_docker_name</span> tail -f /var/<span class="built_in">log</span>/mysql/general.log &gt; mysql.log</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/06/03/insert/" data-id="cj5172iz0000ajkthk5mhjv8s" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/insert-on-duplicate-key-update/">insert on duplicate key update</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/temp-table/">temp table</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/07/12/dependency-injection/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          dependency injection with Clojure
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/03/queue/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">message queue</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/insert/">insert</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/queue/">message queue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/21/groupby/">groupby</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/28/complexity/">定義與實作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Laurence Chen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>groupby | 程式人蔘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一開始是我在寫 4clojure 的練習題的時候，寫到了一個題目，要重新實現 clojure 語言的 groupby 函數。我糾結了好一陣子，又查了不少資料，才勉強用 reduce 寫出來。然而，最近卻在工作中，用上了 groupby 。 12345(fn f [k coll]  (reduce    (fn [c v]      (update-in c [(k v)] (fnil conj [">
+<meta name="keywords" content="groupby database">
+<meta property="og:type" content="article">
+<meta property="og:title" content="groupby">
+<meta property="og:url" content="http://humorless.github.io/2017/05/21/groupby/index.html">
+<meta property="og:site_name" content="程式人蔘">
+<meta property="og:description" content="一開始是我在寫 4clojure 的練習題的時候，寫到了一個題目，要重新實現 clojure 語言的 groupby 函數。我糾結了好一陣子，又查了不少資料，才勉強用 reduce 寫出來。然而，最近卻在工作中，用上了 groupby 。 12345(fn f [k coll]  (reduce    (fn [c v]      (update-in c [(k v)] (fnil conj [">
+<meta property="og:updated_time" content="2017-07-12T15:37:55.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="groupby">
+<meta name="twitter:description" content="一開始是我在寫 4clojure 的練習題的時候，寫到了一個題目，要重新實現 clojure 語言的 groupby 函數。我糾結了好一陣子，又查了不少資料，才勉強用 reduce 寫出來。然而，最近卻在工作中，用上了 groupby 。 12345(fn f [k coll]  (reduce    (fn [c v]      (update-in c [(k v)] (fnil conj [">
+  
+    <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程式人蔘</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">舊版blog http://irongateinfo.blogspot.tw</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://humorless.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-groupby" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/21/groupby/" class="article-date">
+  <time datetime="2017-05-20T22:56:40.000Z" itemprop="datePublished">2017-05-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      groupby
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一開始是我在寫 <a href="http://www.4clojure.com/problem/63" target="_blank" rel="external">4clojure</a> 的練習題的時候，寫到了一個題目，要重新實現 clojure 語言的 groupby 函數。我糾結了好一陣子，又查了不少資料，才勉強用 reduce 寫出來。然而，最近卻在工作中，用上了 groupby 。</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">(<span class="name"><span class="builtin-name">fn</span></span> f [k coll]</div><div class="line">  (<span class="name"><span class="builtin-name">reduce</span></span></div><div class="line">    (<span class="name"><span class="builtin-name">fn</span></span> [c v]</div><div class="line">      (<span class="name"><span class="builtin-name">update-in</span></span> c [(<span class="name">k</span> v)] (<span class="name">fnil</span> conj []) v))</div><div class="line">    &#123;&#125; coll))</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>工作上遇到的問題是要重構同事寫的程式碼。程式碼做的事情是：「接受資料庫 dump 的 json 輸出，跑兩層很複雜的迴圈，對原始的資料做主鍵交換的處理，然後將資料存入 mysql 資料庫。」資料庫 dump 出來的 json 大概長成如下的樣子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">  "result": [</div><div class="line">    &#123;</div><div class="line">      "platform": "c01.i01",</div><div class="line">      "ip_list": [</div><div class="line">        &#123;</div><div class="line">          "ip": "192.168.0.1",</div><div class="line">          "hostname": "ggyy6699"</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          "ip": "192.169.1.1",</div><div class="line">          "hostname:": "ggyy7700"</div><div class="line">        &#125;</div><div class="line">      ]</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      "platform": "c01.i05",</div><div class="line">      "ip_list": [</div><div class="line">        &#123;</div><div class="line">          "ip": "192.168.0.2",</div><div class="line">          "hostname": "ggkk8899"</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          "ip": "192.169.1.2",</div><div class="line">          "hostname:": "ggkk9900"</div><div class="line">        &#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>從這個 json 來看的話，<code>platform</code> 是主鍵 (primary key) 。而每一個 <code>platform</code> 下之下會有多個 <code>hostname</code> 。而程式碼做的事情是，先解析這個 json ，重新整理之後，讓 <code>hostname</code> 變成主鍵 (primary key) ，並且做成一行又一行的 row ，最後要存入關聯式資料庫。讓我感到困擾的地方是因為整理屬性與屬性之間複雜關系的程式碼，都塞在雙重迴圈裡頭，所以雙重迴圈就變得很複雜，而且這一段雙重迴圈的程式碼也無法複用，難以修改、難以維護。</p>
+<p>轉換成用資料庫的觀點來看待這個問題之後，就得到了還不錯的解法：</p>
+<ul>
+<li>資料庫的 dump 輸出，本質上也是 join 兩張資料表的結果輸出，所以主鍵 (primary key) 本來就有可能交換。</li>
+<li>既然要解析的資料是 join 之後的結果，所以有效的處理方式是這樣子：<ol>
+<li>先將 json 的資料跑完簡單的雙重迴圈，雙重迴圈只做一件事，只將將資料做展開 (unfolding)，變成 join 完成的樣子。</li>
+<li>python 的 <code>itertools.groupby</code> ，可以讓資料表 (table) 重新整理，產生出以任意的 column 做為主鍵 (primary key) 的新資料表 (table)。</li>
+</ol>
+</li>
+</ul>
+<p>程式碼如下：
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_h_platforms</span><span class="params">(res)</span>:</span></div><div class="line">    <span class="string">""" sample output</span></div><div class="line">    ctl-zj-061-130-028-019 ['c01.p02', 'c01.p02-kugou']</div><div class="line">    ctl-zj-061-130-028-020 ['c01.p02', 'c01.p02-kugou']</div><div class="line">    ctl-zj-061-130-028-022 ['c01.p02', 'c01.p02-kugou']</div><div class="line">    """</div><div class="line">    product = [(p[<span class="string">"platform"</span>], device[<span class="string">"hostname"</span>])</div><div class="line">               <span class="keyword">for</span> p <span class="keyword">in</span> res[<span class="string">"result"</span>] <span class="keyword">for</span> device <span class="keyword">in</span> p[<span class="string">"ip_list"</span>]]</div><div class="line">    data = sorted(product, key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>])</div><div class="line">    <span class="keyword">for</span> key, grp <span class="keyword">in</span> itertools.groupby(data, key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>]):</div><div class="line">        print(key, list(map(<span class="keyword">lambda</span> x: x[<span class="number">0</span>], set(grp))))</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/05/21/groupby/" data-id="cj5172iyt0009jkth51rod6n5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groupby-database/">groupby database</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/03/queue/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          message queue
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/04/28/complexity/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">定義與實作</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/insert/">insert</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/queue/">message queue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/21/groupby/">groupby</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/28/complexity/">定義與實作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Laurence Chen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

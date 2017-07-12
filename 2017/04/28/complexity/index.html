@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>定義與實作 | 程式人蔘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="緣起：最近在公司做的一個專案的內容，是要改善資料庫的效能。原本寫入資料庫的一段程式碼，因為最初寫的時候太暴力，完全套用 ORM 來硬寫，所以造成資料庫很大的負擔。也因此，我們決定要來重構這一部分的程式碼。 重構分成 3 個層面：  SQL 語法的部分 原本的 SQL 是用 ORM 硬做的，改成活用了 temp table 的語法後，效能就會改善許多。 移動程式碼到合適的 microservices">
+<meta name="keywords" content="essential complexity,accidental complexity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="定義與實作">
+<meta property="og:url" content="http://humorless.github.io/2017/04/28/complexity/index.html">
+<meta property="og:site_name" content="程式人蔘">
+<meta property="og:description" content="緣起：最近在公司做的一個專案的內容，是要改善資料庫的效能。原本寫入資料庫的一段程式碼，因為最初寫的時候太暴力，完全套用 ORM 來硬寫，所以造成資料庫很大的負擔。也因此，我們決定要來重構這一部分的程式碼。 重構分成 3 個層面：  SQL 語法的部分 原本的 SQL 是用 ORM 硬做的，改成活用了 temp table 的語法後，效能就會改善許多。 移動程式碼到合適的 microservices">
+<meta property="og:updated_time" content="2017-07-12T15:37:55.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="定義與實作">
+<meta name="twitter:description" content="緣起：最近在公司做的一個專案的內容，是要改善資料庫的效能。原本寫入資料庫的一段程式碼，因為最初寫的時候太暴力，完全套用 ORM 來硬寫，所以造成資料庫很大的負擔。也因此，我們決定要來重構這一部分的程式碼。 重構分成 3 個層面：  SQL 語法的部分 原本的 SQL 是用 ORM 硬做的，改成活用了 temp table 的語法後，效能就會改善許多。 移動程式碼到合適的 microservices">
+  
+    <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程式人蔘</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">舊版blog http://irongateinfo.blogspot.tw</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://humorless.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-complexity" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/28/complexity/" class="article-date">
+  <time datetime="2017-04-28T04:57:46.000Z" itemprop="datePublished">2017-04-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      定義與實作
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>緣起：最近在公司做的一個專案的內容，是要改善資料庫的效能。原本寫入資料庫的一段程式碼，因為最初寫的時候太暴力，完全套用 ORM 來硬寫，所以造成資料庫很大的負擔。也因此，我們決定要來重構這一部分的程式碼。</p>
+<p>重構分成 3 個層面：</p>
+<ol>
+<li>SQL 語法的部分<br> 原本的 SQL 是用 ORM 硬做的，改成活用了 temp table 的語法後，效能就會改善許多。</li>
+<li>移動程式碼到合適的 microservices<br> 本來週期性寫入資料庫的程式碼是放在 gateway 的模組。因為 gateway 模組需要有很快的反應時間 ，所以在 production 環境中， gateway 的模組有三個 instances ，也因此這段週期性寫入資料庫的程式變成要去考慮「平行寫入」的問題。其實這一段程式碼放錯了「模組」，應該要放在週期性執行的 cron 模組才對。放到全系統唯一的 cron 模組之後，就不需要再考慮「平行寫入」的問題。</li>
+<li>加入合適的抽象層<br> 我們後來決定，要在再加入一層抽象層： restful API 用來包住資料庫的存取指令 。如此讓程式碼可以依賴於 restful API ，而不是直接依賴於某個特定的資料庫。</li>
+</ol>
+<a id="more"></a>
+<p>這些重構，讓我想清楚了軟體工程中很重要的一個概念：「定義」與「實作」的分離。此處的『定義』，也可以解釋成「企業邏輯」，對應的複雜度可以用 essential complexity 來理解。換言之，定義層次的複雜度、定義層次的語意，是由需求來決定。此處的『實作』，則是指實現企業邏輯的各種可能的方案，對應的複雜度可以用 accidental complexity ，(當然我們一定儘可能去選擇 low accidental complexity 的方式來實現。) 一旦加入了 API 抽象層之後，日後的修改就會變得相對簡單。</p>
+<p>比方說，如果是要從 gateway 模組移動 restful API 到 cron 模組，那我們測試的時候，只要確定 gateway 模組與 cron 模組使用 restful API 的方式是等價即可。 API 實現的細節則不會再有任何的改動。</p>
+<p>另一種情況，如果需要做的改動是用 temp table 的語法取代舊有的 SQL 語法。這種改動完全藏在資料庫存取的 restful API 裡，所以我們之後驗証的時候，也就只需要對 restful API 做單元測試即可。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/04/28/complexity/" data-id="cj5172ixu0004jkthxslzt5jh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/accidental-complexity/">accidental complexity</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/essential-complexity/">essential complexity</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/21/groupby/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          groupby
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/04/02/LOC/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">程式語言「表達能力」的排序</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/insert/">insert</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/queue/">message queue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/21/groupby/">groupby</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/28/complexity/">定義與實作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Laurence Chen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

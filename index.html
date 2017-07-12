@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>程式人蔘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="程式人蔘">
+<meta property="og:url" content="http://humorless.github.io/index.html">
+<meta property="og:site_name" content="程式人蔘">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="程式人蔘">
+  
+    <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程式人蔘</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">舊版blog http://irongateinfo.blogspot.tw</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://humorless.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-dependency-injection" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/12/dependency-injection/" class="article-date">
+  <time datetime="2017-07-12T15:44:46.000Z" itemprop="datePublished">2017-07-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>寫 clojure 的時候，雖然套用了 REPL-driven development 的開發方式，已經相對可以讓大多數的函數很快地做過測試。但是，隨著要開發的專案愈來愈大，還是一樣需要用標準的寫法來寫單元測試 (unit test) 。有一個非正規的統計，如果是 Ruby on Rail 的專案，一般而言，90% 的函數都是有副作用的。然而， clojure 語言的專案，往往只有 40% 的函數帶有副作用。</p>
+<p>即使是寫 clojure 語言，還是會遇到有 side effect 的函數，那比較好的寫法是怎麼樣呢？</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/07/12/dependency-injection/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/07/12/dependency-injection/" data-id="cj5172iy90005jkth309c1otg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/clojure/">clojure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dependency-injection/">dependency-injection</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/unit-test/">unit test</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-insert" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/03/insert/" class="article-date">
+  <time datetime="2017-06-02T21:03:24.000Z" itemprop="datePublished">2017-06-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/03/insert/">insert</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>同事為了快速開發，讀寫資料庫的程式碼並沒有多加考慮「資料庫」的特性，而是直接把資料庫當作 memory 來操作。這樣子的寫法，在資料量少的時候還好，資料量大的時候，就需要重構了。這段程式碼處理的問題是： 有一張 table ，有 4000 多個 rows 。每一段時間，就會得到大部分相同但是少部分不同的資料，要寫入這張表。相同的 row 要更新、不存在的 row 要插入。原始的寫法則是：「對於要更新的資料的每一筆，用它的 primary key ，也就是 <code>hostname</code> 這個 column 去 query 這張 table ，如果存在就更新，如果不存在就插入。」</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/06/03/insert/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/06/03/insert/" data-id="cj5172iz0000ajkthk5mhjv8s" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/insert-on-duplicate-key-update/">insert on duplicate key update</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/temp-table/">temp table</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-queue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/03/queue/" class="article-date">
+  <time datetime="2017-06-02T20:08:31.000Z" itemprop="datePublished">2017-06-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/03/queue/">message queue</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>message queue 對我來說，一直都覺得它是一個很抽象，很難完整地理解其重要性的組件。看網路上找到的文章，也往往是用文字解釋，比方說 decoupling 之類的。終於我找到了一圖道盡千言萬言的解釋了。</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/06/03/queue/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/06/03/queue/" data-id="cj5172j02000gjkthfuenzt5p" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/distributed-system/">distributed system</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/message-queue/">message queue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservices/">microservices</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-groupby" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/21/groupby/" class="article-date">
+  <time datetime="2017-05-20T22:56:40.000Z" itemprop="datePublished">2017-05-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/21/groupby/">groupby</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一開始是我在寫 <a href="http://www.4clojure.com/problem/63" target="_blank" rel="external">4clojure</a> 的練習題的時候，寫到了一個題目，要重新實現 clojure 語言的 groupby 函數。我糾結了好一陣子，又查了不少資料，才勉強用 reduce 寫出來。然而，最近卻在工作中，用上了 groupby 。</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">(<span class="name"><span class="builtin-name">fn</span></span> f [k coll]</div><div class="line">  (<span class="name"><span class="builtin-name">reduce</span></span></div><div class="line">    (<span class="name"><span class="builtin-name">fn</span></span> [c v]</div><div class="line">      (<span class="name"><span class="builtin-name">update-in</span></span> c [(<span class="name">k</span> v)] (<span class="name">fnil</span> conj []) v))</div><div class="line">    &#123;&#125; coll))</div></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/05/21/groupby/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/05/21/groupby/" data-id="cj5172iyt0009jkth51rod6n5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groupby-database/">groupby database</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-complexity" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/28/complexity/" class="article-date">
+  <time datetime="2017-04-28T04:57:46.000Z" itemprop="datePublished">2017-04-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/04/28/complexity/">定義與實作</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>緣起：最近在公司做的一個專案的內容，是要改善資料庫的效能。原本寫入資料庫的一段程式碼，因為最初寫的時候太暴力，完全套用 ORM 來硬寫，所以造成資料庫很大的負擔。也因此，我們決定要來重構這一部分的程式碼。</p>
+<p>重構分成 3 個層面：</p>
+<ol>
+<li>SQL 語法的部分<br> 原本的 SQL 是用 ORM 硬做的，改成活用了 temp table 的語法後，效能就會改善許多。</li>
+<li>移動程式碼到合適的 microservices<br> 本來週期性寫入資料庫的程式碼是放在 gateway 的模組。因為 gateway 模組需要有很快的反應時間 ，所以在 production 環境中， gateway 的模組有三個 instances ，也因此這段週期性寫入資料庫的程式變成要去考慮「平行寫入」的問題。其實這一段程式碼放錯了「模組」，應該要放在週期性執行的 cron 模組才對。放到全系統唯一的 cron 模組之後，就不需要再考慮「平行寫入」的問題。</li>
+<li>加入合適的抽象層<br> 我們後來決定，要在再加入一層抽象層： restful API 用來包住資料庫的存取指令 。如此讓程式碼可以依賴於 restful API ，而不是直接依賴於某個特定的資料庫。</li>
+</ol>
+        
+          <p class="article-more-link">
+            <a href="/2017/04/28/complexity/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/04/28/complexity/" data-id="cj5172ixu0004jkthxslzt5jh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/accidental-complexity/">accidental complexity</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/essential-complexity/">essential complexity</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-LOC" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/02/LOC/" class="article-date">
+  <time datetime="2017-04-02T06:06:34.000Z" itemprop="datePublished">2017-04-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/04/02/LOC/">程式語言「表達能力」的排序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://redmonk.com/dberkholz/2013/03/25/programming-languages-ranked-by-expressiveness/" target="_blank" rel="external">原始的文章</a>來自於 RedMonk 網站。作者相當有創意地提出了統計的方法，來比較不同程式語言的表達能力。</p>
+<p>有可能將不同的程式語言以「表達能力」或說是「效率」做個排序嗎？換言之，你能夠比較「透過某些程式語言來寫出某個概念有多容易」嗎？其中一種可以用來做出這種比較的方案是：<strong>每一次的原始碼提交 (commit) 有幾行原始碼的改變</strong>。這個方案可以提供一種觀點：一種程式語言可以讓你在同樣的行數空間內擁有多大的表達能力。因為在程式裡，臭蟲 (bug) 的數量是正比於程式碼的行數，而非這些程式碼表達了多少的概念，所以一種語言如果可以在同樣的行數內表達更多的概念就可以被認為是表達能力更強。</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/04/02/LOC/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/04/02/LOC/" data-id="cj5172ivi0000jkthube2yd78" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/programming-language-expressiveness/">programming language expressiveness</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-cheat" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/15/cheat/" class="article-date">
+  <time datetime="2017-03-15T06:53:31.000Z" itemprop="datePublished">2017-03-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/15/cheat/">Linux 小抄大全</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>遇到指令不會用時，大家應該多少用過 cheatsheet 這個字當關鍵字吧，那如果直接安裝在電腦上呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 安裝 cheat 這個指令</div><div class="line">$sudo pip install cheat</div></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/03/15/cheat/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/03/15/cheat/" data-id="cj5172ix20002jkthlj6qlyj6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cheat/">cheat</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-get-latest-commit-hash-from-git-repo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/15/get-latest-commit-hash-from-git-repo/" class="article-date">
+  <time datetime="2017-03-15T05:37:22.000Z" itemprop="datePublished">2017-03-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/15/get-latest-commit-hash-from-git-repo/">get latest commit hash from git repo</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>「取得 git 遠端 repository 最新的 commit hash 」是我去年在公司做的工作的一小部分，由於當時太偷懶，沒有認真思考「依賴」的問題，我現在得重寫一些程式了。</p>
+<p>去年的解法是這樣子，因為公司的 git repository 是放在 gitlab 上。我觀察了 gitlab 和 github 都有相似的 atom.xml 。不僅路徑一樣、輸出的格式也一樣，我就乾脆使用 gitlab 的 RSS 訂閱 API 來查 git 遠端 repository 最新的 commit hash 。然而， gitlab 在中國是常常連不上的。為了中國的問題，不得不把 git repository 換成是中國境內的 git 服務商，換成了 coding.net 的服務。然後，我就必須要重寫程式了，因為 coding.net 並沒有 RSS 訂閱的功能。</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/03/15/get-latest-commit-hash-from-git-repo/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/03/15/get-latest-commit-hash-from-git-repo/" data-id="cj5172iyj0006jkthy9vmb58x" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dependency/">dependency</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-pattern" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/28/pattern/" class="article-date">
+  <time datetime="2017-02-28T00:12:30.000Z" itemprop="datePublished">2017-02-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/28/pattern/">pattern</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="patterns-programming-with-abstactions-that-are-not-powerful-enough"><a href="#patterns-programming-with-abstactions-that-are-not-powerful-enough" class="headerlink" title="patterns = programming with abstactions that are not powerful enough"></a>patterns = programming with abstactions that are not powerful enough</h2><p>先來引述一下 Paul Graham 的句子
+<blockquote><p>When I see patterns in my programs, I consider it a sign of trouble. The shape of a program should reflect only the problem it needs to solve. Any other regularity in the code is a sign, to me at least, that I&#39;m using abstractions that aren&#39;t powerful enough.</p>
+<footer><strong>Paul Graham</strong><cite>Revenge of the Nerds</cite></footer></blockquote></p>
+<p>為了想出可以妥善解釋這段話的意思的 non-trivial 範例，其實我還想了滿久的。不料真的就在我學習 clojure 語言的過程之中找到了。這個範例是對某個 array 的每一個元素，做相同的運算處理：一個是循序處理、一個是平行處理。</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/02/28/pattern/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/02/28/pattern/" data-id="cj5172izv000ejkth5nryman2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/clojure/">clojure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-migrate" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/27/migrate/" class="article-date">
+  <time datetime="2017-02-27T03:23:02.000Z" itemprop="datePublished">2017-02-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/27/migrate/">migrate</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="更換-blog-平台"><a href="#更換-blog-平台" class="headerlink" title="更換 blog 平台"></a>更換 blog 平台</h3><p>最近寫的技術文章愈來愈多都是有必要直接呈現程式碼。用 gist 的話，等於是把程式碼放在一個外部的空間來存放。總之，我覺得舊版的<a href="http://irongateinfo.blogspot.tw/" target="_blank" rel="external">技術blog</a> 用的 blogspot 雖然簡單好用，但是我是 blog 的重度使用者。我需要 markdown 來輔助。</p>
+<p>候選的選項就是 octopress, hexo 。據說 node.js 的速度會比 Ruby 還快一些，那就用 <a href="https://hexo.io/zh-tw/" target="_blank" rel="external">hexo</a> 吧。</p>
+<p>用 hexo 這種 blog 平台，最關鍵的問題就是備份了：我也找了一個用來處理 hexo 備份問題的<a href="https://github.com/coneycode/hexo-git-backup" target="_blank" rel="external">插件</a>，如此的話要在不同的電腦編輯也沒有問題了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/02/27/migrate/" data-id="cj5172iz8000cjkth6qjzlbma" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/diary/">diary</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/insert/">insert</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/queue/">message queue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/21/groupby/">groupby</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/28/complexity/">定義與實作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Laurence Chen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

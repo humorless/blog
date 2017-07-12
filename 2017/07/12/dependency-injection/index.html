@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>dependency injection with Clojure | 程式人蔘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="寫 clojure 的時候，雖然套用了 REPL-driven development 的開發方式，已經相對可以讓大多數的函數很快地做過測試。但是，隨著要開發的專案愈來愈大，還是一樣需要用標準的寫法來寫單元測試 (unit test) 。有一個非正規的統計，如果是 Ruby on Rail 的專案，一般而言，90% 的函數都是有副作用的。然而， clojure 語言的專案，往往只有 40% 的函數">
+<meta name="keywords" content="unit test,dependency-injection,clojure">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dependency injection with Clojure">
+<meta property="og:url" content="http://humorless.github.io/2017/07/12/dependency-injection/index.html">
+<meta property="og:site_name" content="程式人蔘">
+<meta property="og:description" content="寫 clojure 的時候，雖然套用了 REPL-driven development 的開發方式，已經相對可以讓大多數的函數很快地做過測試。但是，隨著要開發的專案愈來愈大，還是一樣需要用標準的寫法來寫單元測試 (unit test) 。有一個非正規的統計，如果是 Ruby on Rail 的專案，一般而言，90% 的函數都是有副作用的。然而， clojure 語言的專案，往往只有 40% 的函數">
+<meta property="og:updated_time" content="2017-07-12T16:08:56.859Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dependency injection with Clojure">
+<meta name="twitter:description" content="寫 clojure 的時候，雖然套用了 REPL-driven development 的開發方式，已經相對可以讓大多數的函數很快地做過測試。但是，隨著要開發的專案愈來愈大，還是一樣需要用標準的寫法來寫單元測試 (unit test) 。有一個非正規的統計，如果是 Ruby on Rail 的專案，一般而言，90% 的函數都是有副作用的。然而， clojure 語言的專案，往往只有 40% 的函數">
+  
+    <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程式人蔘</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">舊版blog http://irongateinfo.blogspot.tw</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://humorless.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-dependency-injection" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/12/dependency-injection/" class="article-date">
+  <time datetime="2017-07-12T15:44:46.000Z" itemprop="datePublished">2017-07-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      dependency injection with Clojure
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>寫 clojure 的時候，雖然套用了 REPL-driven development 的開發方式，已經相對可以讓大多數的函數很快地做過測試。但是，隨著要開發的專案愈來愈大，還是一樣需要用標準的寫法來寫單元測試 (unit test) 。有一個非正規的統計，如果是 Ruby on Rail 的專案，一般而言，90% 的函數都是有副作用的。然而， clojure 語言的專案，往往只有 40% 的函數帶有副作用。</p>
+<p>即使是寫 clojure 語言，還是會遇到有 side effect 的函數，那比較好的寫法是怎麼樣呢？</p>
+<a id="more"></a>
+<p>我查了一下 stackoverflow 之後，很快就找到了一個很好用的函數 <code>with-redefs</code> 。 stackoverflow 上的答案大意如下： 由於 clojure 語言有 Dynamic binding 的特性，使用 <code>with-redefs</code> 就可以實現同樣的語意了。</p>
+<p>我試了一下，還真的管用，範例如下：</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">(<span class="name">deftest</span> platform-contact-test</div><div class="line">  (<span class="name">testing</span> <span class="string">"platform-contact"</span></div><div class="line">    <span class="comment">; use the DI technique to test the function platform-contact</span></div><div class="line">    (<span class="name">is</span> (<span class="name"><span class="builtin-name">=</span></span> <span class="number">170</span></div><div class="line">           (<span class="name">with-redefs</span> [get-platform-contact (<span class="name"><span class="builtin-name">fn</span></span> [_] (<span class="name"><span class="builtin-name">slurp</span></span> <span class="string">"./resources/contact_data.txt"</span>))]</div><div class="line">             (<span class="name"><span class="builtin-name">count</span></span> (<span class="name">platform-contact</span> (<span class="name">temp-platform-all</span>))))))))</div></pre></td></tr></table></figure>
+<p>在這個範例中，原本的 <code>get-platform-contact</code> 函數是一個有副作用的函數，它會被 <code>platform-contact</code> 函數呼叫。 <code>get-platform-contact</code> 函數會發出一個 http request ，並且傳回遠端 server 上的資料，所以如果沒有加以代換，單元測試就會非常慢。用了 <code>with-redefs</code> 之後，就可以輕易地將 <code>get-platform-contact</code> 代換成一個會傳回固定檔案資料的函數，如此就可以執行快速的單元測試了。</p>
+<p>對於 clojure 這種先進的特性， stackoverflow 上有一句評論： Needing a framework for DI is really just compensating for a lack of sufficient features in the language itself.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/07/12/dependency-injection/" data-id="cj5172iy90005jkth309c1otg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/clojure/">clojure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dependency-injection/">dependency-injection</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/unit-test/">unit test</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/06/03/insert/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">insert</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/insert/">insert</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/03/queue/">message queue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/21/groupby/">groupby</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/28/complexity/">定義與實作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Laurence Chen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
