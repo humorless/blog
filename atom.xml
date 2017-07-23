@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://humorless.github.io/"/>
-  <updated>2017-07-12T16:08:56.859Z</updated>
+  <updated>2017-07-23T04:43:18.497Z</updated>
   <id>http://humorless.github.io/</id>
   
   <author>
@@ -14,6 +14,41 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ttl</title>
+    <link href="http://humorless.github.io/2017/07/23/ttl/"/>
+    <id>http://humorless.github.io/2017/07/23/ttl/</id>
+    <published>2017-07-23T04:17:39.000Z</published>
+    <updated>2017-07-23T04:43:18.497Z</updated>
+    
+    <content type="html"><![CDATA[<p>公司的程式碼裡，有幾張 mysql 表格的 schema 長成這樣子： 
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE mytable (</div><div class="line">  exist boolean DEFAULT NULL,</div><div class="line">  updated datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,</div><div class="line">  ...</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>而該張 table 對應的更新 SQL 語句，最後也會有下列的這一段：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">UPDATE mytable SET exist = 0, updated = FROM_UNIXTIME(%d) WHERE exist = 1 AND updated &lt;= DATE_SUB(NOW(), INTERVAL 10 MINUTE);</div></pre></td></tr></table></figure></p>
+<p>對應的語意是這樣子：『如果這張表格 (table) 裡的某個列 (row) ，已經整整十分鐘沒有任何的寫入或是更新的話，就將這個列的屬性設定為不存在 (exist = 0)』</p>
+<p>會需要用這種寫法：因為這張表格 (table) ，它儲存的資訊是一種「快取」 (cache) 性質的資訊，任何的列 (row) 如果超過十分鐘沒有任何更新或是寫入的話，表示這個列在原始的資料來源已經不存在了。換言之，這個寫法可以算是一種 hack ，因為 mysql 裡的 row 並沒有 time to live (ttl) 的語法。遇到要表達 ttl 語意的情況時，就會需要多幾個欄位和對應的 SQL 語句，才能表現。另一方面， Redis 和 mongoDB 因為設計時，本來就有考慮主要的用途之一要做為 cache 使用，自然也就會提供 ttl 的語法了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;公司的程式碼裡，有幾張 mysql 表格的 schema 長成這樣子： 
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div cla
+    
+    </summary>
+    
+    
+      <category term="SQL" scheme="http://humorless.github.io/tags/SQL/"/>
+    
+      <category term="ttl" scheme="http://humorless.github.io/tags/ttl/"/>
+    
+      <category term="Redis" scheme="http://humorless.github.io/tags/Redis/"/>
+    
+      <category term="mongoDB" scheme="http://humorless.github.io/tags/mongoDB/"/>
+    
+      <category term="cache" scheme="http://humorless.github.io/tags/cache/"/>
+    
+  </entry>
   
   <entry>
     <title>dependency injection with Clojure</title>

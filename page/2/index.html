@@ -3,22 +3,14 @@
 <head>
   <meta charset="utf-8">
   
-  <title>message queue | 程式人蔘</title>
+  <title>程式人蔘</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="message queue 對我來說，一直都覺得它是一個很抽象，很難完整地理解其重要性的組件。看網路上找到的文章，也往往是用文字解釋，比方說 decoupling 之類的。終於我找到了一圖道盡千言萬言的解釋了。">
-<meta name="keywords" content="microservices,message queue,distributed system">
-<meta property="og:type" content="article">
-<meta property="og:title" content="message queue">
-<meta property="og:url" content="http://humorless.github.io/2017/06/03/queue/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="程式人蔘">
+<meta property="og:url" content="http://humorless.github.io/page/2/index.html">
 <meta property="og:site_name" content="程式人蔘">
-<meta property="og:description" content="message queue 對我來說，一直都覺得它是一個很抽象，很難完整地理解其重要性的組件。看網路上找到的文章，也往往是用文字解釋，比方說 decoupling 之類的。終於我找到了一圖道盡千言萬言的解釋了。">
-<meta property="og:image" content="http://humorless.github.io/2017/06/03/queue/datapipeline_complex.png">
-<meta property="og:image" content="http://humorless.github.io/2017/06/03/queue/datapipeline_simple.png">
-<meta property="og:updated_time" content="2017-07-12T15:37:55.845Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="message queue">
-<meta name="twitter:description" content="message queue 對我來說，一直都覺得它是一個很抽象，很難完整地理解其重要性的組件。看網路上找到的文章，也往往是用文字解釋，比方說 decoupling 之類的。終於我找到了一圖道盡千言萬言的解釋了。">
-<meta name="twitter:image" content="http://humorless.github.io/2017/06/03/queue/datapipeline_complex.png">
+<meta name="twitter:title" content="程式人蔘">
   
     <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
   
@@ -73,10 +65,12 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-queue" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main">
+  
+    <article id="post-migrate" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/06/03/queue/" class="article-date">
-  <time datetime="2017-06-02T20:08:31.000Z" itemprop="datePublished">2017-06-03</time>
+    <a href="/2017/02/27/migrate/" class="article-date">
+  <time datetime="2017-02-27T03:23:02.000Z" itemprop="datePublished">2017-02-27</time>
 </a>
     
   </div>
@@ -86,8 +80,8 @@
       <header class="article-header">
         
   
-    <h1 class="article-title" itemprop="name">
-      message queue
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/27/migrate/">migrate</a>
     </h1>
   
 
@@ -95,46 +89,30 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>message queue 對我來說，一直都覺得它是一個很抽象，很難完整地理解其重要性的組件。看網路上找到的文章，也往往是用文字解釋，比方說 decoupling 之類的。終於我找到了一圖道盡千言萬言的解釋了。</p>
-<a id="more"></a>
-<p><img src="./datapipeline_complex.png" alt="使用前">
-<img src="./datapipeline_simple.png" alt="使用後"></p>
-<p>原始的圖，出自一篇 linkedin 講 kafka 的文章。</p>
+        <h3 id="更換-blog-平台"><a href="#更換-blog-平台" class="headerlink" title="更換 blog 平台"></a>更換 blog 平台</h3><p>最近寫的技術文章愈來愈多都是有必要直接呈現程式碼。用 gist 的話，等於是把程式碼放在一個外部的空間來存放。總之，我覺得舊版的<a href="http://irongateinfo.blogspot.tw/" target="_blank" rel="external">技術blog</a> 用的 blogspot 雖然簡單好用，但是我是 blog 的重度使用者。我需要 markdown 來輔助。</p>
+<p>候選的選項就是 octopress, hexo 。據說 node.js 的速度會比 Ruby 還快一些，那就用 <a href="https://hexo.io/zh-tw/" target="_blank" rel="external">hexo</a> 吧。</p>
+<p>用 hexo 這種 blog 平台，最關鍵的問題就是備份了：我也找了一個用來處理 hexo 備份問題的<a href="https://github.com/coneycode/hexo-git-backup" target="_blank" rel="external">插件</a>，如此的話要在不同的電腦編輯也沒有問題了。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/06/03/queue/" data-id="cj5g8k27o000hy8thgfoz1dwb" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/02/27/migrate/" data-id="cj5g8k278000ey8thokehclyn" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/distributed-system/">distributed system</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/message-queue/">message queue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservices/">microservices</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/diary/">diary</a></li></ul>
 
     </footer>
   </div>
   
-    
-<nav id="article-nav">
-  
-    <a href="/2017/06/03/insert/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          insert
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2017/05/21/groupby/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">groupby</div>
-    </a>
-  
-</nav>
-
-  
 </article>
 
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 </section>
         
           <aside id="sidebar">

@@ -67,6 +67,50 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-ttl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/23/ttl/" class="article-date">
+  <time datetime="2017-07-23T04:17:39.000Z" itemprop="datePublished">2017-07-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/23/ttl/">ttl</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>公司的程式碼裡，有幾張 mysql 表格的 schema 長成這樣子： 
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE mytable (</div><div class="line">  exist boolean DEFAULT NULL,</div><div class="line">  updated datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,</div><div class="line">  ...</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>而該張 table 對應的更新 SQL 語句，最後也會有下列的這一段：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">UPDATE mytable SET exist = 0, updated = FROM_UNIXTIME(%d) WHERE exist = 1 AND updated &lt;= DATE_SUB(NOW(), INTERVAL 10 MINUTE);</div></pre></td></tr></table></figure></p>
+<p>對應的語意是這樣子：『如果這張表格 (table) 裡的某個列 (row) ，已經整整十分鐘沒有任何的寫入或是更新的話，就將這個列的屬性設定為不存在 (exist = 0)』</p>
+<p>會需要用這種寫法：因為這張表格 (table) ，它儲存的資訊是一種「快取」 (cache) 性質的資訊，任何的列 (row) 如果超過十分鐘沒有任何更新或是寫入的話，表示這個列在原始的資料來源已經不存在了。換言之，這個寫法可以算是一種 hack ，因為 mysql 裡的 row 並沒有 time to live (ttl) 的語法。遇到要表達 ttl 語意的情況時，就會需要多幾個欄位和對應的 SQL 語句，才能表現。另一方面， Redis 和 mongoDB 因為設計時，本來就有考慮主要的用途之一要做為 cache 使用，自然也就會提供 ttl 的語法了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/07/23/ttl/" data-id="cj5g8k26z000cy8thtk36erfx" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cache/">cache</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongoDB/">mongoDB</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ttl/">ttl</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-dependency-injection" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/07/12/dependency-injection/" class="article-date">
@@ -99,7 +143,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/07/12/dependency-injection/" data-id="cj5172iy90005jkth309c1otg" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/07/12/dependency-injection/" data-id="cj5g8k2630006y8th1giaoieb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/clojure/">clojure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dependency-injection/">dependency-injection</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/unit-test/">unit test</a></li></ul>
@@ -142,7 +186,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/06/03/insert/" data-id="cj5172iz0000ajkthk5mhjv8s" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/06/03/insert/" data-id="cj5g8k26n000ay8thx8ivzliy" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/insert-on-duplicate-key-update/">insert on duplicate key update</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/temp-table/">temp table</a></li></ul>
@@ -185,7 +229,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/06/03/queue/" data-id="cj5172j02000gjkthfuenzt5p" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/06/03/queue/" data-id="cj5g8k27o000hy8thgfoz1dwb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/distributed-system/">distributed system</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/message-queue/">message queue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservices/">microservices</a></li></ul>
@@ -229,7 +273,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/05/21/groupby/" data-id="cj5172iyt0009jkth51rod6n5" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/05/21/groupby/" data-id="cj5g8k26i0009y8thth4yn25b" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groupby-database/">groupby database</a></li></ul>
@@ -278,7 +322,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/04/28/complexity/" data-id="cj5172ixu0004jkthxslzt5jh" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/04/28/complexity/" data-id="cj5g8k25g0004y8thfxfxjfv2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/accidental-complexity/">accidental complexity</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/essential-complexity/">essential complexity</a></li></ul>
@@ -322,7 +366,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/04/02/LOC/" data-id="cj5172ivi0000jkthube2yd78" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/04/02/LOC/" data-id="cj5g8k2310000y8th9wmnogfk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/programming-language-expressiveness/">programming language expressiveness</a></li></ul>
@@ -366,7 +410,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/03/15/cheat/" data-id="cj5172ix20002jkthlj6qlyj6" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/03/15/cheat/" data-id="cj5g8k24l0002y8thfd5y59if" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cheat/">cheat</a></li></ul>
@@ -410,7 +454,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/03/15/get-latest-commit-hash-from-git-repo/" data-id="cj5172iyj0006jkthy9vmb58x" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/03/15/get-latest-commit-hash-from-git-repo/" data-id="cj5g8k25y0005y8thkeyj4f66" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dependency/">dependency</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
@@ -456,7 +500,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/02/28/pattern/" data-id="cj5172izv000ejkth5nryman2" class="article-share-link">Share</a>
+      <a data-url="http://humorless.github.io/2017/02/28/pattern/" data-id="cj5g8k27h000gy8thrymff7gi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/clojure/">clojure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
@@ -468,48 +512,11 @@
 
 
   
-    <article id="post-migrate" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/27/migrate/" class="article-date">
-  <time datetime="2017-02-27T03:23:02.000Z" itemprop="datePublished">2017-02-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/27/migrate/">migrate</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="更換-blog-平台"><a href="#更換-blog-平台" class="headerlink" title="更換 blog 平台"></a>更換 blog 平台</h3><p>最近寫的技術文章愈來愈多都是有必要直接呈現程式碼。用 gist 的話，等於是把程式碼放在一個外部的空間來存放。總之，我覺得舊版的<a href="http://irongateinfo.blogspot.tw/" target="_blank" rel="external">技術blog</a> 用的 blogspot 雖然簡單好用，但是我是 blog 的重度使用者。我需要 markdown 來輔助。</p>
-<p>候選的選項就是 octopress, hexo 。據說 node.js 的速度會比 Ruby 還快一些，那就用 <a href="https://hexo.io/zh-tw/" target="_blank" rel="external">hexo</a> 吧。</p>
-<p>用 hexo 這種 blog 平台，最關鍵的問題就是備份了：我也找了一個用來處理 hexo 備份問題的<a href="https://github.com/coneycode/hexo-git-backup" target="_blank" rel="external">插件</a>，如此的話要在不同的電腦編輯也沒有問題了。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://humorless.github.io/2017/02/27/migrate/" data-id="cj5172iz8000cjkth6qjzlbma" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/diary/">diary</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
 
 
-  
-
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+  </nav>
 </section>
         
           <aside id="sidebar">
@@ -519,6 +526,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/07/23/ttl/">ttl</a>
+          </li>
         
           <li>
             <a href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
@@ -536,10 +547,6 @@
             <a href="/2017/05/21/groupby/">groupby</a>
           </li>
         
-          <li>
-            <a href="/2017/04/28/complexity/">定義與實作</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -549,7 +556,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
+      <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SQL/" style="font-size: 20px;">SQL</a> <a href="/tags/accidental-complexity/" style="font-size: 10px;">accidental complexity</a> <a href="/tags/cache/" style="font-size: 10px;">cache</a> <a href="/tags/cheat/" style="font-size: 10px;">cheat</a> <a href="/tags/clojure/" style="font-size: 20px;">clojure</a> <a href="/tags/dependency/" style="font-size: 10px;">dependency</a> <a href="/tags/dependency-injection/" style="font-size: 10px;">dependency-injection</a> <a href="/tags/diary/" style="font-size: 10px;">diary</a> <a href="/tags/distributed-system/" style="font-size: 10px;">distributed system</a> <a href="/tags/essential-complexity/" style="font-size: 10px;">essential complexity</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/groupby-database/" style="font-size: 10px;">groupby database</a> <a href="/tags/insert-on-duplicate-key-update/" style="font-size: 10px;">insert on duplicate key update</a> <a href="/tags/message-queue/" style="font-size: 10px;">message queue</a> <a href="/tags/microservices/" style="font-size: 10px;">microservices</a> <a href="/tags/mongoDB/" style="font-size: 10px;">mongoDB</a> <a href="/tags/programming-language-expressiveness/" style="font-size: 10px;">programming language expressiveness</a> <a href="/tags/temp-table/" style="font-size: 10px;">temp table</a> <a href="/tags/ttl/" style="font-size: 10px;">ttl</a> <a href="/tags/unit-test/" style="font-size: 10px;">unit test</a>
     </div>
   </div>
 
