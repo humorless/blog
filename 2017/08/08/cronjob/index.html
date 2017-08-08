@@ -3,14 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: unit test | 程式人蔘</title>
+  <title>cronjob | 程式人蔘</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="程式人蔘">
-<meta property="og:url" content="http://humorless.github.io/tags/unit-test/index.html">
+  <meta name="description" content="話說我平常在工作上，有時候寫一些簡單的 script ，也有一些習慣。而這些習慣在我把 script 設定成 cronjob 的時候，就造成了許多 bugs 。">
+<meta name="keywords" content="cron,scripts">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cronjob">
+<meta property="og:url" content="http://humorless.github.io/2017/08/08/cronjob/index.html">
 <meta property="og:site_name" content="程式人蔘">
+<meta property="og:description" content="話說我平常在工作上，有時候寫一些簡單的 script ，也有一些習慣。而這些習慣在我把 script 設定成 cronjob 的時候，就造成了許多 bugs 。">
+<meta property="og:updated_time" content="2017-08-08T11:03:29.736Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="程式人蔘">
+<meta name="twitter:title" content="cronjob">
+<meta name="twitter:description" content="話說我平常在工作上，有時候寫一些簡單的 script ，也有一些習慣。而這些習慣在我把 script 設定成 cronjob 的時候，就造成了許多 bugs 。">
   
     <link rel="alternate" href="/atom.xml" title="程式人蔘" type="application/atom+xml">
   
@@ -65,39 +70,70 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/07/12/dependency-injection/" class="archive-article-date">
-  <time datetime="2017-07-12T15:44:46.000Z" itemprop="datePublished">7月 12</time>
+        <section id="main"><article id="post-cronjob" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/08/cronjob/" class="article-date">
+  <time datetime="2017-08-08T10:44:00.000Z" itemprop="datePublished">2017-08-08</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/12/dependency-injection/">dependency injection with Clojure</a>
+    <h1 class="article-title" itemprop="name">
+      cronjob
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>話說我平常在工作上，有時候寫一些簡單的 script ，也有一些習慣。而這些習慣在我把 script 設定成 cronjob 的時候，就造成了許多 bugs 。
+<a id="more"></a></p>
+<ol>
+<li><p>使用 env 來啟動直譯器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python3</div></pre></td></tr></table></figure>
+<p>腳本裡如果有上頭的這一行，直接把腳本放進 cronjob 會無法執行，必須直接指定直譯器的路徑。<br>例如： <code>python3 /your/path/script.py</code> 而比較省事的方式，就是直接在腳本裡指定直譯器的位置。</p>
+</li>
+<li><p>直在在腳本裡，讀取同一個資料夾之下的 config 檔。</p>
+<p>在設定 cronjob 時，就會變成一定要寫成 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">* * * * *   cd /your/path/  &amp;&amp; /your/path/script.sh</div></pre></td></tr></table></figure>
+<p>否則腳本會找不到它需要的 config 檔。比較好的設定方式，是腳本要接受一個 command line argument 來指定 config 檔的位置。
+這樣子才可以寫成如下的格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">* * * * *   /your/path/script.sh --config /your/path/config.yaml</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>最後，經過了設定 cronjob 的種種除錯之後，我體會到解決 cronjob 的問題，最重要的，還是一開始就這樣子設定：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">* * * * *   /your/path/script.sh  &gt;&gt;/tmp/script.log 2&gt;&amp;1</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://humorless.github.io/2017/08/08/cronjob/" data-id="cj63guf1g0001iwth5phoyy93" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cron/">cron</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scripts/">scripts</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/07/23/ttl/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ttl</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         
